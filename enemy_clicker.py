@@ -19,7 +19,7 @@ class EnemyClicker:
         """
         if region is None:
             # default battlemap region
-            self.region = {"left": 414, "top": 308, "width": 921, "height": 503}
+            self.region = {"left": 420, "top": 310, "width": 915, "height": 480}
         else:
             self.region = region
         self.threshold = threshold
