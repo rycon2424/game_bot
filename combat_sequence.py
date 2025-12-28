@@ -18,7 +18,7 @@ class CombatSequence:
         attack_default="attack_default.png",
         attack_images=None,
         heal_threshold=30,
-        check_interval=0.6
+        check_interval=0.5
     ):
         self.exit_image = exit_image
         self.heal_image = heal_image
@@ -49,13 +49,12 @@ class CombatSequence:
 
             # 2️ Health check → heal
             current, _ = read_health()
-            if current is not None and current < self.heal_threshold:
-                if click_template(self.heal_image, max_attempts=1):
-                    print(f"Low HP ({current}), used healing.")
-                    time.sleep(0.1)
-                    self.reset_mouse_to_center()
-                    time.sleep(self.check_interval)
-                    continue
+            print(f"Current read health value = {current}")
+            #if current is not None and current < self.heal_threshold:
+            #    if click_template(self.heal_image, max_attempts=1):
+            #        print(f"Low HP ({current}), used healing.")
+            #        time.sleep(self.check_interval)
+            #        continue
 
             # 3️ Capture ONE frame for all attacks
             frame = capture_frame()
@@ -65,8 +64,6 @@ class CombatSequence:
             if pos:
                 pyautogui.click(*pos)
                 print("Power-up activated.")
-                time.sleep(0.1)
-                self.reset_mouse_to_center()
                 time.sleep(self.check_interval)
                 continue
 
@@ -76,8 +73,6 @@ class CombatSequence:
                 if pos:
                     pyautogui.click(*pos)
                     print(f"Directional attack: {attack_image}")
-                    time.sleep(0.1)
-                    self.reset_mouse_to_center()
                     time.sleep(self.check_interval)
                     break
             else:
@@ -86,7 +81,7 @@ class CombatSequence:
                 if pos:
                     pyautogui.click(*pos)
                     print("Default attack.")
-                    time.sleep(0.1)
-                    self.reset_mouse_to_center()
 
+            time.sleep(self.check_interval)
+            self.reset_mouse_to_center()
             time.sleep(self.check_interval)
