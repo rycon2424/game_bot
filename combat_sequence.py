@@ -36,7 +36,16 @@ class CombatSequence:
     def reset_mouse_to_center(self):
         screen_width, screen_height = pyautogui.size()
         pyautogui.moveTo(screen_width // 2, screen_height // 2, duration=0.05)
-    
+        time.sleep(0.02)  # tiny pause for safety
+
+    def move_and_click(self, pos):
+        """Move cursor to position and click safely."""
+        if pos:
+            pyautogui.moveTo(*pos, duration=0.05)
+            time.sleep(0.02)  # tiny delay to ensure move is registered
+            pyautogui.click()
+            time.sleep(0.02)  # small delay after click
+
     def start_combat(self):
         print("Starting combat sequence...")
         self.running = True
@@ -62,7 +71,7 @@ class CombatSequence:
             # 4️ Power-up (highest priority)
             pos = find_powerup_ready_on_frame(frame, self.powerup_image)
             if pos:
-                pyautogui.click(*pos)
+                self.move_and_click(pos)
                 print("Power-up activated.")
                 time.sleep(self.check_interval)
                 continue
@@ -71,15 +80,15 @@ class CombatSequence:
             for attack_image in self.attack_images:
                 pos = find_template_on_frame(frame, attack_image)
                 if pos:
-                    pyautogui.click(*pos)
+                    self.move_and_click(pos)
                     print(f"Directional attack: {attack_image}")
                     time.sleep(self.check_interval)
                     break
             else:
-            # 6️ Default attack fallback (same frame)
+                # 6️ Default attack fallback (same frame)
                 pos = find_template_on_frame(frame, self.attack_default)
                 if pos:
-                    pyautogui.click(*pos)
+                    self.move_and_click(pos)
                     print("Default attack.")
 
             time.sleep(self.check_interval)

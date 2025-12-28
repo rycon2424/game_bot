@@ -7,9 +7,9 @@ import re
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 HEALTH_REGION = {
-    "left": 420,
+    "left": 425,
     "top": 167,
-    "width": 40,
+    "width": 36,
     "height": 9
 }
 
@@ -24,6 +24,7 @@ def read_health():
 
     # Stage 3: resize
     gray_resized = cv2.resize(gray, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imwrite("debug_stage3_resized.png", gray_resized)
 
     # OCR
     config = "--psm 7 -c tessedit_char_whitelist=0123456789/"
