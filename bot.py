@@ -3,10 +3,11 @@ import numpy as np
 import pytesseract
 import cv2
 import re
-import click_exclamation
+import image_comparer
 import time
 from combat_sequence import CombatSequence
 from enemy_clicker import EnemyClicker
+from health_reader import read_health
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -17,33 +18,11 @@ HEALTH_REGION = {
     "height": 20
 }
 
-def read_health():
-    with mss.mss() as sct:
-        screenshot = sct.grab(HEALTH_REGION)
-        img = np.array(screenshot)
-
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.resize(gray, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-    _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
-
-    config = "--psm 7 -c tessedit_char_whitelist=0123456789/"
-    text = pytesseract.image_to_string(thresh, config=config)
-
-    digits = re.findall(r"\d+", text)
-
-    if len(digits) >= 2:
-        current = int(digits[0])
-        maximum = int(digits[1])
-        return current, maximum
-    else:
-        return None, None
-
 def wait_for_start_combat(max_attempts=5):
     """Try to find start_combat.png with fallback logic."""
     attempts = 0
     while attempts < max_attempts:
-        found = click_exclamation.click_template("start_combat.png", max_attempts=1, wait_between=0.3)
+        found = image_comparer.click_template("start_combat.png", max_attempts=1, wait_between=0.3)
         if found:
             return True
         attempts += 1
@@ -53,7 +32,7 @@ def wait_for_start_combat(max_attempts=5):
 def ensure_exit_combat():
     """Ensure exit_combat.png is clicked after combat ends."""
     while True:
-        clicked = click_exclamation.click_template("exit_combat.png", max_attempts=1)
+        clicked = image_comparer.click_template("exit_combat.png", max_attempts=1)
         if not clicked:
             print("exit_combat.png not found anymore, combat fully exited.")
             break
@@ -70,7 +49,7 @@ def perform_actions():
 
     if current == maximum:
         # Step 1: try clicking exclamation marks
-        clicked = click_exclamation.click_template("exclamation.png")
+        clicked = image_comparer.click_template("exclamation.png")
         if clicked:
             print("Exclamation clicked, waiting for start_combat.png...")
         else:

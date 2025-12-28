@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import pyautogui
 import time
-import click_exclamation
+import image_comparer
 
 class EnemyClicker:
     """
@@ -19,7 +19,7 @@ class EnemyClicker:
         """
         if region is None:
             # default battlemap region
-            self.region = {"left": 420, "top": 310, "width": 915, "height": 480}
+            self.region = {"left": 420, "top": 310, "width": 800, "height": 440}
         else:
             self.region = region
         self.threshold = threshold
