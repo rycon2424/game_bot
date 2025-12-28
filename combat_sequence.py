@@ -59,11 +59,11 @@ class CombatSequence:
             # 2️ Health check → heal
             current, _ = read_health()
             print(f"Current read health value = {current}")
-            #if current is not None and current < self.heal_threshold:
-            #    if click_template(self.heal_image, max_attempts=1):
-            #        print(f"Low HP ({current}), used healing.")
-            #        time.sleep(self.check_interval)
-            #        continue
+            if current is not None and current < self.heal_threshold:
+                if click_template(self.heal_image, max_attempts=1):
+                    print(f"Low HP ({current}), used healing.")
+                    time.sleep(self.check_interval)
+                    continue
 
             # 3️ Capture ONE frame for all attacks
             frame = capture_frame()
