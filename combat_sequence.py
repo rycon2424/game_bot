@@ -1,12 +1,13 @@
 ﻿import time
 import pyautogui
-from health_reader import read_health
 from image_comparer import (
     click_template,
     capture_frame,
     find_template_on_frame,
     find_powerup_ready_on_frame
 )
+from health_reader import read_health, HP_BAR_LEFT_HALF
+from health_reader import read_hp_bar_red_ratio, is_hp_bar_low
 
 
 class CombatSequence:
@@ -48,6 +49,7 @@ class CombatSequence:
 
     def start_combat(self):
         print("Starting combat sequence...")
+
         self.running = True
 
         while self.running:
@@ -58,12 +60,20 @@ class CombatSequence:
 
             # 2️ Health check → heal
             current, _ = read_health()
-            print(f"Current read health value = {current}")
+            print(f"Current OCR health = {current}")
+
             if current is not None and current < self.heal_threshold:
-                if click_template(self.heal_image, max_attempts=1):
-                    print(f"Low HP ({current}), used healing.")
-                    time.sleep(self.check_interval)
-                    continue
+                # Extra sanity check for very low HP values
+                if current < 20:
+                    if not is_hp_bar_low():
+                        print("⚠️ OCR misread detected (bar not low), skipping heal")
+                        current = None  # ignore this reading
+
+                if current is not None:
+                    if click_template(self.heal_image, max_attempts=1):
+                        print(f"Low HP ({current}), used healing.")
+                        time.sleep(self.check_interval)
+                        continue
 
             # 3️ Capture ONE frame for all attacks
             frame = capture_frame()

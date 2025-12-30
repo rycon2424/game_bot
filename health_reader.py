@@ -13,6 +13,13 @@ HEALTH_REGION = {
     "height": 9
 }
 
+HP_BAR_LEFT_HALF = {
+    "left": 385,
+    "top": 167,
+    "width": 40,
+    "height": 8
+}
+
 def read_health():
     with mss.mss() as sct:
         screenshot = sct.grab(HEALTH_REGION)
@@ -35,3 +42,31 @@ def read_health():
     if len(digits) >= 2:
         return int(digits[0]), int(digits[1])
     return None, None
+
+def is_hp_bar_low(threshold_ratio=0.5):
+    return read_hp_bar_red_ratio() > threshold_ratio
+
+def read_hp_bar_red_ratio():
+    with mss.mss() as sct:
+        img = np.array(sct.grab(HP_BAR_LEFT_HALF))
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    lower_red1 = np.array([0, 120, 40])
+    upper_red1 = np.array([10, 255, 255])
+    lower_red2 = np.array([160, 120, 40])
+    upper_red2 = np.array([180, 255, 255])
+
+    mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+    mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+    red_mask = mask1 | mask2
+
+    red_pixels = np.count_nonzero(red_mask)
+    total_pixels = red_mask.size
+
+    return red_pixels / total_pixels
+
+def capture_hp_bar_debug(filename="debug_hp_bar.png"):
+    with mss.mss() as sct:
+        img = np.array(sct.grab(HP_BAR_LEFT_HALF))
+    cv2.imwrite(filename, img)

@@ -7,7 +7,7 @@ import image_comparer
 import time
 from combat_sequence import CombatSequence
 from enemy_clicker import EnemyClicker
-from health_reader import read_health
+from health_reader import read_health, capture_hp_bar_debug, read_hp_bar_red_ratio
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -45,7 +45,11 @@ def perform_actions():
         print("OCR unreliable, skipping this cycle.")
         return
 
-    print(f"Health: {current}/{maximum}")
+    bar_ratio = read_hp_bar_red_ratio()
+    print(f"Health: {current}/{maximum} | "
+    f"Health Bar Red = {bar_ratio:.2%}")
+    
+    capture_hp_bar_debug()
 
     if current == maximum:
         # Step 1: try clicking exclamation marks
